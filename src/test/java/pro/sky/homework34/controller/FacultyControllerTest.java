@@ -1,75 +1,99 @@
 package pro.sky.homework34.controller;
 
-import net.minidev.json.JSONObject;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import pro.sky.homework34.model.Faculty;
-import pro.sky.homework34.repository.FacultyRepository;
-import pro.sky.homework34.service.FacultyService;
 
-import java.util.Optional;
+import java.util.Collection;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FacultyControllerTest {
+
+    @LocalServerPort
+    private int port;
+
     @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private FacultyRepository facultyRepository;
-
-    @SpyBean
-    private FacultyService facultyService;
-
-    @InjectMocks
     private FacultyController facultyController;
 
+    @Autowired
+    private TestRestTemplate restTemplate;
+    Faculty faculty = new Faculty("Gvn", "5", 0l);
 
     @Test
-    public void createFacultyTest() throws Exception {
-        final String name = "slytherin";
-        final String color = "green";
-        final Long id = 4L;
+    void contextLoads() throws Exception {
+        Assertions.assertThat(facultyController).isNotNull();
+    }
 
+    @Test
+    public void testGetFacultyId() throws Exception {
+        Assertions
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty/1",
+                        String.class))
+                .contains("1");
+    }
 
-        JSONObject facultyObject = new JSONObject();
-        facultyObject.put("name", name);
-        facultyObject.put("color", color);
+    @Test
+    public void testGetStudentsByFacultyId() throws Exception {
+        Assertions
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty/1/students",
+                        Collection.class)).isNotNull();
+        Assertions
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty/9/students",
+                        String.class)).contains("500");
+    }
+    @Test
+    public void testGetFaculty() throws Exception{
+        Assertions
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty",
+                        Collection.class)).isNotNull();
+        Assertions
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty?color=1",
+                        String.class)).isNotNull();
+        Assertions
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty?name=1",
+                        String.class)).isNotNull();
+    }
+    @Test
+    public void testPostFaculty(){
 
-        Faculty faculty = new Faculty();
-        faculty.setId(id);
-        faculty.setName(name);
-        faculty.setColor(color);
+        Assertions
+                .assertThat(this.restTemplate.postForObject("http://localhost:" + port + "/faculty",
+                        faculty, String.class))
+                .contains("Gvn");
 
-        when(facultyRepository.save(any(Faculty.class))).thenReturn(faculty);
-        when(facultyRepository.findById(any(Long.class))).thenReturn(Optional.of(faculty));
+    }
+    @Test
+    public void testDeletedFacultyById() throws Exception {
+        //Faculty faculty = new Faculty("111",12,0l);
+        Long id = this.restTemplate.postForObject("http://localhost:" + port + "/faculty",
+                faculty, Faculty.class).getId();
+        restTemplate.delete("http://localhost:" + port
+                + "/faculty/"+id);
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port +
+                                "/faculty/"+id,
+                        String.class)))
+                .toString().contains("500");
+    }
+    @Test
+    public void testPutFaculty(){
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .post("/faculty")
-                        .content(facultyObject.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").value(name))
-                .andExpect(jsonPath("$.color").value(color));
+        Long id = this.restTemplate.postForObject("http://localhost:" + port + "/faculty",
+                faculty, Faculty.class).getId();
+        Faculty faculty1 = new Faculty("Rst","51",id);
 
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get("/faculty/" + id)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.name").value(name))
-                .andExpect(jsonPath("$.color").value(color));
+        restTemplate.put( "http://localhost:" + port + "/faculty",faculty1);
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port +
+                                "/student/"+id,
+                        String.class))).toString().contains("Rst");
 
     }
 }
+

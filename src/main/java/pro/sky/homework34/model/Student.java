@@ -26,4 +26,7 @@ public class Student {
     @JoinColumn(name = "faculty_id")
     @Getter
     private Faculty faculty;
+
+    public Student(String number, int i, long l) {
+    }
 }

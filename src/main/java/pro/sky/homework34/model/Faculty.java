@@ -27,6 +27,9 @@ public class Faculty {
     @OneToMany(mappedBy = "faculty")
     private List<Student> students;
 
+    public Faculty(String gvn, String number, long l) {
+    }
+
     public Collection<Student> getStudents() {
         return students;
     }

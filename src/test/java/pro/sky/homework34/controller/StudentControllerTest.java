@@ -6,10 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
+import pro.sky.homework34.model.Faculty;
 import pro.sky.homework34.model.Student;
+
+import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StudentControllerTest {
+
     @LocalServerPort
     private int port;
 
@@ -20,25 +25,76 @@ public class StudentControllerTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void contextLoads () throws Exception {
+    void contextLoads() throws Exception {
         Assertions.assertThat(studentController).isNotNull();
     }
-
     @Test
-    public void testCreateStudent() {
-        Student student = new Student();
-        student.setName("Frank");
-        student.setAge(25);
+    public void testGetStudentAll() throws Exception {
         Assertions
-                .assertThat(this.restTemplate.postForObject("http://localhost:" + port + "/student", student,  String.class))
+                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/student", String.class))
                 .isNotNull();
+    }
+    @Test
+    public void testGetStudentbyId() throws Exception{
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port + "/student/1",
+                        String.class)))
+                .contains("1");
+    }
+    @Test
+    public void testGetFacultyByStudentId() throws Exception{
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port + "/student/1/faculty", Faculty.class)))
+                .as(String.valueOf(Faculty.class));
+    }
+    @Test
+    public void testGetListStudentsByStudentAge() throws Exception{
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port + "/student/age/12", List.class)))
+                .isNotNull();
+    }
+    @Test
+    public void testGetListStudentsByStudentAgeWhenBadAge() throws Exception{
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port + "/student/age/0",
+                        ResponseEntity.class)))
+                .toString().contains("404");
 
     }
-
     @Test
-    public void testFindStudent () throws Exception{
+    public void testPostStudent(){
+        Student student = new Student("111",12,0l);
         Assertions
-                .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/student", String.class));
+                .assertThat(this.restTemplate.postForObject("http://localhost:" + port + "/student",
+                        student, String.class))
+                .contains("111");
+
+    }
+    @Test
+    public void testDeletedStudentById() throws Exception {
+        Student student = new Student("111",12,0l);
+        Long id = this.restTemplate.postForObject("http://localhost:" + port + "/student",
+                student, Student.class).getId();
+        restTemplate.delete("http://localhost:" + port
+                + "/student/"+id);
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port +
+                                "/student/"+id,
+                        String.class)))
+                .toString().contains("500");
+    }
+    @Test
+    public void testPutStudent(){
+        Student student = new Student("111",12,0L);
+        Long id = this.restTemplate.postForObject("http://localhost:" + port + "/student",
+                student, Student.class).getId();
+        Student student1 = new Student("222",14,id);
+
+        restTemplate.put( "http://localhost:" + port + "/student",student1);
+        Assertions
+                .assertThat((this.restTemplate.getForObject("http://localhost:" + port +
+                                "/student/"+id,
+                        String.class))).contains(""+id);
 
     }
 }
