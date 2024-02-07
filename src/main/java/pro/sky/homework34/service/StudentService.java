@@ -6,6 +6,7 @@ import pro.sky.homework34.model.Student;
 import pro.sky.homework34.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class StudentService {
@@ -47,5 +48,16 @@ public class StudentService {
     }
     public Faculty findFacultyByStudent(long id){
         return studentRepository.getReferenceById(id).getFaculty();
+    }
+
+    public List<Integer> countNumberOfAllStudents (){
+        return studentRepository.countNumberOfAllStudents();
+    }
+
+    public List<Double> countAvgAge (){
+        return studentRepository.countAverageAge();
+    }
+    public List<Student> countLastFiveStudents(){
+        return studentRepository.getLastFiveStudents();
     }
 }

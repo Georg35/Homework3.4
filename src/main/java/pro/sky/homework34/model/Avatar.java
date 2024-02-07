@@ -6,9 +6,10 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import nonapi.io.github.classgraph.json.Id;
-
+@Getter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

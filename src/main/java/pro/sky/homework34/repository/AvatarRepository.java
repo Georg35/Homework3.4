@@ -6,5 +6,5 @@ import pro.sky.homework34.model.Avatar;
 import java.util.Optional;
 
 public interface AvatarRepository extends JpaRepository<Avatar, Long> {
-    Optional<Avatar> findAvatarById (Long studentId);
+    Avatar findAvatarById (Long studentId);
 }

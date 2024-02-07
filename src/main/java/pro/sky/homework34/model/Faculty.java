@@ -1,5 +1,6 @@
 package pro.sky.homework34.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +24,7 @@ public class Faculty {
     private String name;
     @Column
     private  String color;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "faculty")
     private List<Student> students;
 

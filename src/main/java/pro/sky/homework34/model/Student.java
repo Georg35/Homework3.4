@@ -1,5 +1,6 @@
 package pro.sky.homework34.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Student {
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     @Getter
+    @JsonIgnore
     private Faculty faculty;
 
     public Student(String number, int i, long l) {

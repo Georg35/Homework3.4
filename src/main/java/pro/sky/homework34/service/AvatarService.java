@@ -3,6 +3,7 @@ package pro.sky.homework34.service;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pro.sky.homework34.model.Avatar;
@@ -15,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -35,6 +37,9 @@ public class AvatarService {
 
     public void uploadImage(Long studentId, MultipartFile file) throws IOException {
         Student student = studentService.find(studentId);
+        if (student == null) {
+            student = new Student();
+        }
 
         Path filePath = Path.of(avatarsDir, studentId + "." + getExtension(file.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
@@ -50,6 +55,9 @@ public class AvatarService {
         }
 
         Avatar avatar = findAvatarById(studentId);
+        if (avatar == null) {
+            avatar = new Avatar();
+        }
         avatar.setStudent(student);
         avatar.setFilePath(filePath.toString());
         avatar.setFileSize(file.getSize());
@@ -61,7 +69,7 @@ public class AvatarService {
     }
 
     public Avatar findAvatarById(Long studentId) {
-        return avatarRepository.findAvatarById(studentId).orElseThrow();
+        return avatarRepository.findAvatarById(studentId);
     }
 
     private byte[] generateImagePreview(Path filePath) throws IOException {
@@ -85,5 +93,11 @@ public class AvatarService {
 
     private String getExtension(String filename){
         return filename.substring(filename.lastIndexOf(".") + 1);
+    }
+
+
+    public List<Avatar> getAllAvatars(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber-1, pageSize);
+        return avatarRepository.findAll(pageRequest).getContent();
     }
 }

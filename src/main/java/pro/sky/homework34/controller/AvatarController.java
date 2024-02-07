@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pro.sky.homework34.model.Avatar;
 import pro.sky.homework34.service.AvatarService;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,4 +63,13 @@ public class AvatarController {
             is.transferTo(os);
         }
     }
+
+    @GetMapping
+    public ResponseEntity<List> sortAvatarByPages(@RequestParam("page")Integer pageNumber,
+                                                  @RequestParam("size") Integer pageSize){
+        java.util.List<Avatar> avatars = avatarService.getAllAvatars (pageNumber, pageSize);
+        return ResponseEntity.ok((List) avatars);
+
+    }
+
 }
