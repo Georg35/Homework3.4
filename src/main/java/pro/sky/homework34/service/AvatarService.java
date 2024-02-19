@@ -2,6 +2,8 @@ package pro.sky.homework34.service;
 
 import jakarta.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,9 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Service
 @Transactional
 public class AvatarService {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(FacultyService.class);
     @Value("${path.to.avatars.folder}")
     private String avatarsDir;
 
@@ -69,7 +74,13 @@ public class AvatarService {
     }
 
     public Avatar findAvatarById(Long studentId) {
-        return avatarRepository.findAvatarById(studentId);
+        Avatar avatar=  avatarRepository.findById(studentId).orElse(null);
+        logger.info("Was invoked method for findAvatarById");
+        if (avatar == null) {
+            logger.error("There is no avatar with id = {}", studentId);
+        }
+
+        return avatar;
     }
 
     private byte[] generateImagePreview(Path filePath) throws IOException {
