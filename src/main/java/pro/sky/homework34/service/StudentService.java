@@ -9,6 +9,8 @@ import pro.sky.homework34.repository.StudentRepository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class StudentService {
@@ -84,5 +86,41 @@ public class StudentService {
     }
     public List<Student> countLastFiveStudents(){
         return studentRepository.getLastFiveStudents();
+    }
+
+    public List<String> getStudentsStartingWithA() {
+        List<Student> students = studentRepository.findAll();
+
+        List<String> namesStartingWithA = students.stream()
+                .map(Student::getName)
+                .filter(name -> name != null && name.startsWith("A"))
+                .map(String::toUpperCase)
+                .sorted()
+                .collect(Collectors.toList());
+
+        return namesStartingWithA;
+
+
+    }
+
+    public Double getAverageAge() {
+        List<Student> students = studentRepository.findAll();
+
+        double averageAge = students.stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0);
+        return averageAge;
+
+    }
+
+    public Integer returnNumber() {
+
+        int sum = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()
+                .reduce(0, (a, b) -> a + b);
+        return sum;
+
     }
 }

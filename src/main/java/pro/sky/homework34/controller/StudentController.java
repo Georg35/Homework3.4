@@ -9,6 +9,7 @@ import pro.sky.homework34.service.StudentService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("student")
@@ -95,4 +96,14 @@ public class StudentController {
         return studentService.countLastFiveStudents();
     }
 
+
+    @GetMapping ("/returnNumber")
+    public ResponseEntity<Integer>returnNumber(){
+        return ResponseEntity.ok(studentService.returnNumber());
+    }
+
+    @GetMapping("/starts-with-A")
+    public ResponseEntity<List<String>> getStudentsStartingWithA() {
+        return ResponseEntity.ok(studentService.getStudentsStartingWithA());
+    }
 }

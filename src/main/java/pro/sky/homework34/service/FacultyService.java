@@ -9,6 +9,10 @@ import pro.sky.homework34.model.Student;
 import pro.sky.homework34.repository.FacultyRepository;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class FacultyService {
@@ -83,4 +87,18 @@ public class FacultyService {
         logger.info("Was invoked method for findStudentByFaculty");
         return facultyRepository.getReferenceById(id).getStudents();
     }
+
+    public String getLongestFacultyName() {
+        List<Faculty> faculties = facultyRepository.findAll();
+        Optional<Faculty> longestFacultyOptional = faculties.stream()
+                .max(Comparator.comparingInt(faculty -> faculty.getName().length()));
+
+        String longestFacultyName = longestFacultyOptional
+                .map(Faculty::getName)
+                .orElse("No faculties found");
+
+        return longestFacultyName;
+    }
 }
+
+
