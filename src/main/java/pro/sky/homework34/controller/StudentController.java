@@ -106,4 +106,15 @@ public class StudentController {
     public ResponseEntity<List<String>> getStudentsStartingWithA() {
         return ResponseEntity.ok(studentService.getStudentsStartingWithA());
     }
+
+    @GetMapping("/print-parallel")
+    public void printStudentNamesParallel() throws InterruptedException {
+        studentService.printStudentNamesParallel();
+    }
+
+    @GetMapping("/print-synchronized")
+    public String printSynchronized() {
+        studentService.synchronizedPrint();
+        return "Names printed synchronously";
+    }
 }

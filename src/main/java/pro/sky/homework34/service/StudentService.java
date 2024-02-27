@@ -123,4 +123,66 @@ public class StudentService {
         return sum;
 
     }
+
+    public void printStudentNamesParallel() throws InterruptedException {
+        getAllStudents();
+
+        Thread t1 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(0));
+            System.out.println(studentRepository.findAll().get(1));
+        });
+
+        Thread t2 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(2));
+            System.out.println(studentRepository.findAll().get(3));
+        });
+
+        Thread t3 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(4));
+            System.out.println(studentRepository.findAll().get(5));
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        t1.join();
+        t2.join();
+        t3.join();
+    }
+
+    public synchronized void synchronizedPrint() {
+        System.out.println(studentRepository.findAll().get(0).getName());
+        System.out.println(studentRepository.findAll().get(1).getName());
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(2).getName());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(3).getName());
+        });
+
+        Thread thread3 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(4).getName());
+        });
+
+        Thread thread4 = new Thread(() -> {
+            System.out.println(studentRepository.findAll().get(5).getName());
+        });
+
+        thread1.start();
+        thread2.start();
+        thread3.start();
+        thread4.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+            thread3.join();
+            thread4.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
