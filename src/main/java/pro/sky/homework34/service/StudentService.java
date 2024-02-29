@@ -162,7 +162,7 @@ public class StudentService {
         System.out.println(studentRepository.findAll().get(i).getName());
     }
 
-    public synchronized void synchronizedPrint() {
+    public void synchronizedPrint() {
             printName(0);
             printName(1);
         Thread thread1 = new Thread(() -> {
