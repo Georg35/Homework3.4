@@ -1,0 +1,9 @@
+SELECT * FROM students s where "name" like %O%;
+
+SELECT * FROM students s where age between 10 and 20;
+
+SELECT "name"  FROM students s ;
+
+SELECT "age" FROM  students s  where "id" < 5;
+
+SELECT * FROM students ORDER BY age;
