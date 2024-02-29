@@ -43,7 +43,7 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public  void removeStudent(Long id) {
+    public void removeStudent(Long id) {
         Student student = studentRepository.findById(id).orElse(null);
         studentRepository.deleteById(id);
         logger.info("Was invoked method for remove student");
@@ -60,7 +60,7 @@ public class StudentService {
 
     public Collection<Student> findStudentByAge(Integer age) {
         logger.info("Was invoked method for findStudentByAge");
-        Collection<Student> student= studentRepository.findStudentByAge(age);
+        Collection<Student> student = studentRepository.findStudentByAge(age);
         if (student == null) {
             logger.error("There is no student with age = {}", age);
         }
@@ -68,23 +68,25 @@ public class StudentService {
         return student;
     }
 
-    public Collection<Student> findByAgeBetween(int min, int max){
+    public Collection<Student> findByAgeBetween(int min, int max) {
         logger.info("Was invoked method for findByAgeBetween");
         return studentRepository.findByAgeBetweenIgnoreCase(min, max);
     }
-    public Faculty findFacultyByStudent(long id){
+
+    public Faculty findFacultyByStudent(long id) {
         logger.info("Was invoked method for findFacultyByStudent");
         return studentRepository.getReferenceById(id).getFaculty();
     }
 
-    public List<Integer> countNumberOfAllStudents (){
+    public List<Integer> countNumberOfAllStudents() {
         return studentRepository.countNumberOfAllStudents();
     }
 
-    public List<Double> countAvgAge (){
+    public List<Double> countAvgAge() {
         return studentRepository.countAverageAge();
     }
-    public List<Student> countLastFiveStudents(){
+
+    public List<Student> countLastFiveStudents() {
         return studentRepository.getLastFiveStudents();
     }
 
@@ -124,9 +126,8 @@ public class StudentService {
 
     }
 
-    public void printStudentNamesParallel() throws InterruptedException {
-        getAllStudents();
 
+    public void printStudentNamesParallel() {
         Thread t1 = new Thread(() -> {
             System.out.println(studentRepository.findAll().get(0));
             System.out.println(studentRepository.findAll().get(1));
@@ -146,31 +147,39 @@ public class StudentService {
         t2.start();
         t3.start();
 
-        t1.join();
-        t2.join();
-        t3.join();
+        try {
+            t1.join();
+            t2.join();
+            t3.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public synchronized void printName(int i) {
+        System.out.println(studentRepository.findAll().get(i).getName());
     }
 
     public synchronized void synchronizedPrint() {
-        System.out.println(studentRepository.findAll().get(0).getName());
-        System.out.println(studentRepository.findAll().get(1).getName());
-
+            printName(0);
+            printName(1);
         Thread thread1 = new Thread(() -> {
-            System.out.println(studentRepository.findAll().get(2).getName());
+            printName(2);
         });
 
         Thread thread2 = new Thread(() -> {
-            System.out.println(studentRepository.findAll().get(3).getName());
+            printName(3);
         });
 
         Thread thread3 = new Thread(() -> {
-            System.out.println(studentRepository.findAll().get(4).getName());
+            printName(4);
         });
 
         Thread thread4 = new Thread(() -> {
-            System.out.println(studentRepository.findAll().get(5).getName());
+       printName(5);
         });
-
         thread1.start();
         thread2.start();
         thread3.start();
@@ -186,3 +195,4 @@ public class StudentService {
         }
     }
 }
+
